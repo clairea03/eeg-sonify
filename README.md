@@ -21,7 +21,7 @@ The Neural Data Sonification Platform will be an interactive Python-based tool d
 - **Data Processing**: NumPy, SciPy, Pandas, MNE-Python
 - **Audio Generation**: Librosa, PyAudio
 - **Interactive Interface**: Streamlit
-- **Visualization**: Plotly, Matplotlib
+- **Visualization**: Plotly
 
 ## Development Roadmap
 
@@ -56,3 +56,33 @@ This project will be developed incrementally with regular GitHub commits to docu
 - **Data Exploration**: Novel approaches to understanding complex datasets
 - **Educational Tools**: Making neural data accessible and fun
 - **Accessibility**: Alternative data representation for visually impaired researchers
+
+## Project Structure
+
+* neural_sonify/
+  * analysis/
+    * __init__.py
+    * correlations.py (Statistical correlation functions)
+    * features.py (Feature extraction functions)
+  * data/
+    * __init__.py
+    * loader.py (Data import functions for neural formats)
+    * processor.py (Data preprocessing functions)
+  * sonification/
+    * __init__.py
+    * engine.py (Core sonification system)
+    * mappings.py (Data-to-sound parameter mapping)
+    * synthesizers.py (Sound synthesis methods)
+  * ui/
+    * __init__.py
+    * app.py (Main Streamlit application)
+    * views.py (Page content and layout)
+    * widgets.py (Reusable UI components)
+  * visualization/
+    * __init__.py
+    * plots.py (Plotly visualization functions)
+  * __init__.py 
+  * config.py (Configuration parameters)
+  * .gitignore 
+  * README.md (You are here :))
+  * requirements.txt (Project dependencies)
