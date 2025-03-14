@@ -4,7 +4,7 @@
 
 The Neural Data Sonification Platform will be an interactive Python-based tool designed to transform neural and biomedical data into sound. This project aims to create a new way for researchers to explore complex datasets by engaging both visual and auditory senses, potentially revealing patterns that might remain hidden in traditional analysis methods.
 
-> **Note**: This project is currently in the planning phase. This README outlines the vision and planned features, which may evolve as development progresses.
+> **Note**: This project is currently in early development. This README outlines the general vision and planned features, which may evolve as development progresses.
 
 ## Planned Features
 
