@@ -23,32 +23,11 @@ The Neural Data Sonification Platform will be an interactive Python-based tool d
 - **Interactive Interface**: Streamlit
 - **Visualization**: Plotly
 
-## Development Roadmap
+## Project Flowchart
+![mermaid-diagram-2025-03-13-212122](https://github.com/user-attachments/assets/6f6d8204-17c9-4655-bcad-36d552583598)
 
-This project will be developed incrementally with regular GitHub commits to document progress:
+^ Flowchart created with Mermaid Live Editor
 
-1. **Project Setup & Foundation**
-   - Repository structure and documentation
-   - Basic data handling framework
-
-2. **Core Data Processing**
-   - Signal preprocessing and feature extraction
-   - Data transformation utilities
-
-3. **Sonification Engine**
-   - Basic audio generation
-   - Parameter mapping framework
-   - Advanced sonification methods
-
-4. **Streamlit Interface**
-   - Interactive controls and visualizations
-   - Audio playback functionality
-   - Analysis tools integration
-
-5. **Testing & Refinement**
-   - Performance optimization
-   - Comprehensive documentation
-   - User testing and feedback incorporation
 
 ## Potential Applications
 
