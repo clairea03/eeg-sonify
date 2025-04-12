@@ -1,67 +1,93 @@
-# Neural Data Sonification Platform
+# EEG Sonification Explorer
 
-## Project Vision
+A Streamlit application for exploring the sonification of EEG (electroencephalogram) signals. This application allows users to generate simulated EEG patterns for different brain states, visualize them in various ways, and listen to their sonified representations.
 
-The Neural Data Sonification Platform will be an interactive Python-based tool designed to transform neural and biomedical data into sound. This project aims to create a new way for researchers to explore complex datasets by engaging both visual and auditory senses, potentially revealing patterns that might remain hidden in traditional analysis methods.
+## Features
 
-> **Note**: This project is currently in early development. This README outlines the general vision and planned features, which may evolve as development progresses.
+- **EEG Simulation**: Generate realistic EEG data for different brain states:
+  - Normal Awake (with dominant alpha rhythm)
+  - Sleep Stage N1 (light sleep)
+  - Slow Wave Sleep (N3) (deep sleep with delta waves)
+  - REM Sleep (with mixed frequencies)
+  - Seizure Activity (with rhythmic discharges)
 
-## Planned Features
+- **Visualizations**:
+  - Time series display
+  - Power spectral density with frequency band highlighting
+  - Spectrogram for time-frequency analysis
+  - Animated real-time EEG display
 
-- **Data Import**: Support for common neural data formats (EEG, MEG) and generic time series data
-- **Sonification Engine**: Multiple methods to convert data into meaningful sound
-- **Interactive UI**: A Streamlit-based interface for real-time parameter adjustments
-- **Synchronized Visualizations**: See what you hear with time-aligned visualizations
-- **Analysis Tools**: Statistical correlations between audio features and data patterns
-- **Export Options**: Save sonifications and visualizations for research presentations
+- **Sonification**:
+  - Simple tone mapping (EEG amplitude → sound frequency)
+  - Multi-band sonification (different waveforms for each frequency band)
+  - Audio playback and saving capabilities
 
-## Planned Technology Stack
-
-- **Core Language**: Python 3.8+
-- **Data Processing**: NumPy, SciPy, Pandas, MNE-Python
-- **Audio Generation**: Librosa, PyAudio
-- **Interactive Interface**: Streamlit
-- **Visualization**: Plotly
-
-## Project Flowchart
-![mermaid-diagram-2025-03-13-212122](https://github.com/user-attachments/assets/6f6d8204-17c9-4655-bcad-36d552583598)
-
-^ Flowchart created with Mermaid Live Editor
-
-
-## Potential Applications
-
-- **Neurofeedback**: Real-time sonification of brain activity
-- **Data Exploration**: Novel approaches to understanding complex datasets
-- **Educational Tools**: Making neural data accessible and fun
-- **Accessibility**: Alternative data representation for visually impaired researchers
+- **Analysis**:
+  - Frequency band power extraction and visualization
+  - Hjorth parameters calculation
+  - Basic signal statistics
 
 ## Project Structure
 
-* neural_sonify/
-  * analysis/
-    * __init__.py
-    * correlations.py (Statistical correlation functions)
-    * features.py (Feature extraction functions)
-  * data/
-    * __init__.py
-    * loader.py (Data import functions for neural formats)
-    * processor.py (Data preprocessing functions)
-  * sonification/
-    * __init__.py
-    * engine.py (Core sonification system)
-    * mappings.py (Data-to-sound parameter mapping)
-    * synthesizers.py (Sound synthesis methods)
-  * ui/
-    * __init__.py
-    * app.py (Main Streamlit application)
-    * views.py (Page content and layout)
-    * widgets.py (Reusable UI components)
-  * visualization/
-    * __init__.py
-    * plots.py (Plotly visualization functions)
-  * __init__.py 
-  * config.py (Configuration parameters)
-  * .gitignore 
-  * README.md (You are here :))
-  * requirements.txt (Project dependencies)
+- **app.py**: Main Streamlit application with user interface
+- **modules/**:
+  - **eeg_simulator.py**: Generates synthetic EEG data
+  - **signal_processor.py**: Processes and analyzes EEG signals
+  - **visualizer.py**: Creates visualizations of the EEG data
+  - **sonifier.py**: Converts EEG signals to sound
+
+## Installation
+
+1. Clone this repository
+2. Install requirements:
+   ```
+   pip install -r requirements.txt
+   ```
+3. Run the application:
+   ```
+   streamlit run app.py
+   ```
+
+## Requirements
+
+- Python 3.7+
+- NumPy
+- SciPy
+- Matplotlib
+- Streamlit
+- Pandas
+- SoundDevice
+- MNE (optional, for advanced EEG processing)
+
+## Technical Details
+
+The application uses sophisticated signal processing techniques to:
+- Generate realistic EEG signals using filtered noise and specific waveforms
+- Extract frequency bands using Butterworth filters
+- Calculate power spectral densities using Welch's method
+- Create spectrograms using the Short-Time Fourier Transform
+- Sonify signals through frequency mapping and waveform synthesis
+
+## Usage
+
+1. Select a brain state and parameters in the sidebar
+2. Generate EEG data
+3. Explore the visualizations in the "Visualization" tab
+4. Listen to the sonified representation using the playback controls
+5. View detailed signal analysis in the "Analysis" tab
+6. Learn about EEG sonification in the "About" tab
+
+
+## Acknowledgments & Resources
+
+This project is based on established methods in EEG research and signal processing.
+
+    [1] MNE-Python: MNE 1.9.0 documentation. Available at: https://mne.tools/stable/auto_examples/simulation/generate_simulated_raw_data.html
+    
+    [2] Introduction to MNE-Python: Overview of MEG/EEG analysis with MNE-Python. Available at: https://mne.tools/stable/auto_tutorials/intro/10_overview.html
+    
+    [3] Vavra, P., et al. (2023). SleepEEGpy: a Python-based package for the preprocessing and analysis of sleep EEG. bioRxiv. Available at: https://www.biorxiv.org/content/10.1101/2023.03.08.531747v1
+    
+    [4] Hermann, T., Hunt, A., & Neuhoff, J. G. (Eds.). (2011). The Sonification Handbook. Logos Verlag Berlin.
+    
+    [5] Niedermeyer, E., & da Silva, F. L. (Eds.). (2005). Electroencephalography: Basic Principles, Clinical Applications, and Related Fields. Lippincott Williams & Wilkins.
