@@ -2,8 +2,8 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import sounddevice as sd
 import threading
+import sounddevice as sd
 
 # Import custom modules - modular design allows separation of concerns
 # and better maintainability as each component handles a specific aspect
