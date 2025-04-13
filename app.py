@@ -2,8 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import threading
-import sounddevice as sd
+import os
 
 # Import custom modules - modular design allows separation of concerns
 # and better maintainability as each component handles a specific aspect
@@ -21,8 +20,8 @@ st.set_page_config(page_title="EEG Sonification Explorer", layout="wide")
 # since Streamlit reruns the entire script on each interaction
 if 'eeg_data' not in st.session_state:
     st.session_state.eeg_data = None
-if 'audio_thread' not in st.session_state:
-    st.session_state.audio_thread = None
+if 'current_position' not in st.session_state:
+    st.session_state.current_position = 0
 
 # Title and description
 st.title("EEG Sonification Explorer")
@@ -97,6 +96,7 @@ if st.sidebar.button("Generate EEG Data"):
         
         # Store in session state for persistence across UI interactions
         st.session_state.eeg_data = eeg_data
+        st.session_state.current_position = 0
 
 # Tabs organize the interface according to user goals:
 # visualization, analysis, and educational content
@@ -108,79 +108,85 @@ with tab1:
         
         # Controls organized in columns for intuitive grouping
         # following standard audio player paradigms
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("Play Audio"):
-                # Different sonification methods highlight different
-                # aspects of brain activity patterns
-                if sonification_method == "Simple Tone Mapping":
-                    # Simpler method focuses on overall amplitude variations
-                    audio_data = sonifier.simple_tone_mapping(eeg_data, duration)
-                else:  # Multi-band Sonification
-                    # More complex method differentiates frequency bands
-                    # linked to different cognitive and physiological processes
-                    bands = processor.extract_frequency_bands(eeg_data)
-                    audio_data = sonifier.multi_band_sonification(bands)
-                
-                # Volume adjustment for user comfort and perceptual tuning
-                audio_data = audio_data * volume
-                
-                # Always stop current playback before starting new
-                # to prevent audio overlap and cacophony
-                sd.stop()
-                
-                # Threaded playback prevents UI freezing
-                # crucial for maintaining interactive experience
-                st.session_state.audio_thread = threading.Thread(
-                    target=play_audio_thread, 
-                    args=(audio_data, sonifier.sampling_rate)
-                )
-                st.session_state.audio_thread.start()
-        
+            if st.button("Generate & Play Audio"):
+                with st.spinner("Generating audio..."):
+                    if sonification_method == "Simple Tone Mapping":
+                        audio_data = sonifier.simple_tone_mapping(eeg_data, duration)
+                    else:  
+                        bands = processor.extract_frequency_bands(eeg_data)
+                        audio_data = sonifier.multi_band_sonification(bands)
+                    
+                    # Apply volume
+                    audio_data = audio_data * volume
+                    
+                    # Generate a temporary filename
+                    filename = f"eeg_sonification_{brain_state.replace(' ', '_')}.wav"
+                    
+                    # Save the audio file
+                    sonifier.save_audio(audio_data, filename)
+                    
+                    # Display an audio player
+                    st.audio(open(filename, 'rb').read(), format='audio/wav')
+
         with col2:
-            if st.button("Stop Audio"):
-                # Immediate audio cessation important for
-                # user control, especially with disturbing sounds
-                sd.stop()
-        
-        with col3:
             if st.button("Save Audio"):
-                # Audio export for offline analysis or sharing
-                # follows the same sonification process as playback
-                if sonification_method == "Simple Tone Mapping":
-                    audio_data = sonifier.simple_tone_mapping(eeg_data, duration)
-                else:  # Multi-band Sonification
-                    bands = processor.extract_frequency_bands(eeg_data)
-                    audio_data = sonifier.multi_band_sonification(bands)
-                
-                audio_data = audio_data * volume
-                # Filename encodes brain state for easy identification
-                filename = f"eeg_sonification_{brain_state.replace(' ', '_')}.wav"
-                sonifier.save_audio(audio_data, filename)
-                st.success(f"Audio saved as {filename}")
+                with st.spinner("Generating audio file..."):
+                    if sonification_method == "Simple Tone Mapping":
+                        audio_data = sonifier.simple_tone_mapping(eeg_data, duration)
+                    else: 
+                        bands = processor.extract_frequency_bands(eeg_data)
+                        audio_data = sonifier.multi_band_sonification(bands)
+                    
+                    audio_data = audio_data * volume
+                    filename = f"eeg_sonification_{brain_state.replace(' ', '_')}.wav"
+                    sonifier.save_audio(audio_data, filename)
+                    
+                    # Create a download button
+                    with open(filename, "rb") as f:
+                        st.download_button(
+                            label="Download Audio",
+                            data=f,
+                            file_name=filename,
+                            mime="audio/wav"
+                        )
+         # Create a slider for position control
+        max_position = len(eeg_data) - 1
+        position_slider = st.slider(
+            "EEG Position", 
+            0, max_position, 
+            st.session_state.current_position,
+            step=max(1, int(sampling_rate / 10))  # Step by 1/10 second increments
+        )
         
-        # Multiple visualization modes provide complementary views
-        # of the same underlying neural data
+        # Update position in session state
+        st.session_state.current_position = position_slider
         
-        # Time series shows amplitude variations directly
-        # critical for identifying transient events and morphology
-        st.subheader("EEG Time Series")
+        # Display current time
+        current_time = st.session_state.current_position / sampling_rate
+        total_time = len(eeg_data) / sampling_rate
+        st.text(f"Time: {current_time:.2f}s / {total_time:.2f}s")
+        
+        # Show the visualization at the current position
+        fig = visualizer.plot_animated_eeg(eeg_data)(st.session_state.current_position)
+        if fig:
+            st.pyplot(fig)
+            plt.close(fig)
+        
+        # Display static visualizations
+        st.subheader("EEG Full Time Series")
         st.pyplot(visualizer.plot_time_series(eeg_data))
         
-        # Spectrogram reveals time-frequency relationships
-        # essential for identifying non-stationary phenomena
         st.subheader("EEG Spectrogram")
         st.pyplot(visualizer.create_spectrogram(eeg_data))
         
-        # Power spectrum shows frequency distribution
-        # highlighting dominant rhythms characteristic of different brain states
+        # Compute and display power spectrum
         freqs, psd = processor.compute_power_spectral_density(eeg_data)
         st.subheader("Power Spectral Density")
         st.pyplot(visualizer.plot_power_spectrum(freqs, psd))
     else:
-        # Clear instruction for first-time users
-        # reduces cognitive load in learning the application
         st.info("Generate EEG data using the controls in the sidebar to begin.")
 
 with tab2:
@@ -306,4 +312,7 @@ with tab3:
     [4] Hermann, T., Hunt, A., & Neuhoff, J. G. (Eds.). (2011). The Sonification Handbook. Logos Verlag Berlin.
     
     [5] Niedermeyer, E., & da Silva, F. L. (Eds.). (2005). Electroencephalography: Basic Principles, Clinical Applications, and Related Fields. Lippincott Williams & Wilkins.
+    
+    ## 
+                
     """)
