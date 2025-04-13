@@ -255,12 +255,12 @@ with tab2:
 with tab3:
     st.header("About EEG Sonification")
     st.markdown("""
-    ## What is EEG Sonification?
+    ### What is EEG Sonification?
     
     EEG sonification is the process of converting electroencephalogram (EEG) data into sound. This technique allows 
     users to "hear" brain activity patterns that might be difficult to perceive visually.
     
-    ## Brain States in This Application
+    ### Brain States in This Application
     
     This application allows you to explore several simulated brain states:
     
@@ -270,38 +270,145 @@ with tab3:
     - **REM Sleep**: Rapid eye movement sleep with mixed frequency activity similar to wakefulness
     - **Seizure Activity**: Abnormal, synchronized electrical discharges that may present as rhythmic spike-wave patterns
     
-    ## Sonification Methods
+    ### Sonification Methods
     
     - **Simple Tone Mapping**: Maps the EEG amplitude directly to the frequency of a sine wave
     - **Multi-band Sonification**: Extracts different frequency bands and maps each to a different sound character
     
-    ## Technical Details
+    ### Technical Details
     
-    ### EEG Simulation
+    #### EEG Simulation
     
-    The simulated EEG data in this application is generated using a combination of band-limited noise and specific waveforms characteristic of each brain state. Our implementation is inspired by the simulation capabilities in MNE-Python [1].
+    The simulated EEG data in this application is generated using a combination of band-limited noise and specific waveforms characteristic of each brain state:
     
-    #### Band-limited noise generation
-    - White noise is generated and filtered to specific frequency bands
-    - A Butterworth bandpass filter is applied using SciPy's signal processing module
+    #### Mathematical Foundation
     
-    #### Brain state-specific patterns
-    - **Normal Awake**: Dominant alpha (8-13 Hz) with subdominant theta, beta, and delta
-    - **N1 Sleep**: Dominant theta (4-8 Hz) with vertex waves
-    - **N3 Sleep**: High-amplitude delta (0.5-4 Hz)
-    - **REM Sleep**: Mixed frequencies with sawtooth waves
-    - **Seizure**: 3 Hz spike-wave complexes with evolving amplitude
+        **Band-limited noise generation**:
+       - White noise is generated using `np.random.normal(0, 1, N)`
+       - A Butterworth bandpass filter is applied using scipy's `signal.butter` and `signal.filtfilt`
+       - The filter transfer function is defined as:
+         ```
+         H(s) = |H(jω)| = 1/√(1 + (ω/ωc)^2n)
+         ```
+         where n is the filter order (4 in our case), ωc is the cutoff frequency
+    
+        **Brain state-specific patterns**:
+       - **Normal Awake**: Dominant alpha (8-13 Hz) with subdominant theta, beta, and delta
+       - **N1 Sleep**: Dominant theta (4-8 Hz) with vertex waves (simulated using Gaussian pulses)
+       - **N3 Sleep**: High-amplitude delta (0.5-4 Hz)
+       - **REM Sleep**: Mixed frequencies with sawtooth waves
+       - **Seizure**: 3 Hz spike-wave complexes with evolving amplitude
     
     ### Signal Processing
     
-    Our signal processing approach draws from established methods in EEG analysis, including:
+    #### Frequency Domain Analysis
     
-    - Frequency band extraction using bandpass filters
-    - Power spectral density estimation using Welch's method
-    - Computation of Hjorth parameters (Activity, Mobility, Complexity)
-    - Spectrogram visualization with Short-Time Fourier Transform
+    Power Spectral Density (PSD) estimation is performed using Welch's method:
     
-    ## References
+    1. The signal is divided into overlapping segments
+    2. Each segment is windowed
+    3. The FFT is computed for each windowed segment
+    4. The squared magnitude of each FFT is averaged across segments
+    
+    The PSD estimation is defined as:
+    
+    ```
+    P̂xx(f) = (1/K) ∑ |X_k(f)|²
+    ```
+    
+    where X_k(f) is the FFT of the k-th windowed segment.
+    
+    #### Frequency Bands Extraction
+    
+    EEG frequency bands are extracted using Butterworth bandpass filters:
+    
+    - **Delta**: 0.5-4 Hz, associated with deep sleep
+    - **Theta**: 4-8 Hz, associated with drowsiness and idling
+    - **Alpha**: 8-13 Hz, associated with relaxed wakefulness
+    - **Beta**: 13-30 Hz, associated with active thinking and focus
+    - **Gamma**: 30-100 Hz, associated with cognitive processing
+    
+    #### Hjorth Parameters
+    
+    Hjorth parameters provide time-domain features of the EEG signal:
+    
+    1. **Activity**: Variance of the signal, representing signal power
+       ```
+       Activity = var(y(t))
+       ```
+    
+    2. **Mobility**: Square root of the ratio of the variance of the first derivative to the variance of the signal
+       ```
+       Mobility = √(var(y'(t))/var(y(t)))
+       ```
+    
+    3. **Complexity**: Ratio of the mobility of the first derivative to the mobility of the signal
+       ```
+       Complexity = Mobility(y'(t))/Mobility(y(t))
+       ```
+    
+    ### Sonification Algorithms
+    
+    #### Simple Tone Mapping
+    
+    The simple tone mapping algorithm:
+    
+    1. Interpolates the EEG signal to match audio sampling rate
+    2. Normalizes the interpolated signal to a range between 0 and 1
+    3. Maps the normalized values to frequencies between 100 Hz and 1000 Hz:
+       ```
+       freq_mapped = 100 + normalized_eeg * 900
+       ```
+    4. Generates a sine wave with frequency modulation:
+       ```
+       phase = cumsum(2π * freq_mapped / sample_rate)
+       audio = 0.5 * sin(phase)
+       ```
+    
+    #### Multi-band Sonification
+    
+    The multi-band sonification:
+    
+    1. Extracts frequency bands using bandpass filters
+    2. Assigns different waveforms to each band:
+       - **Delta**: Low frequency sine waves (base_freq = 100 Hz)
+       - **Theta**: Triangle waves (base_freq = 200 Hz)
+       - **Alpha**: Square waves (base_freq = 300 Hz)
+       - **Beta**: Sawtooth waves (base_freq = 400 Hz)
+       - **Gamma**: Noise-modulated sine waves (base_freq = 500 Hz)
+    3. Modulates each waveform's frequency based on the band's amplitude
+    4. Mixes all the sounds together with band-specific amplitudes
+    
+    ### Visualization Techniques
+    
+    #### Spectrogram Implementation
+    
+    The spectrogram is implemented using the Short-Time Fourier Transform (STFT):
+    
+    1. The signal is divided into overlapping segments
+    2. Each segment is windowed
+    3. FFT is applied to each segment
+    4. The squared magnitude of the FFT is displayed as color intensity
+    
+    The mathematical representation of the STFT is:
+    
+    ```
+    X(τ,ω) = ∫ x(t)w(t-τ)e^(-jωt)dt
+    ```
+    
+    where w(t) is the window function centered at time τ.
+    
+    #### EEG Visualization
+    
+    The EEG visualization in this application:
+    
+    1. Uses a sliding window approach to display a portion of the signal
+    2. Allows manual navigation through the signal using a slider
+    3. Maintains consistent y-axis scaling based on the overall signal amplitude
+    4. Provides time markers to indicate the current position in the recording
+    
+    
+    ### References
     
     [1] MNE-Python: MNE 1.9.0 documentation. Available at: https://mne.tools/stable/auto_examples/simulation/generate_simulated_raw_data.html
     
@@ -313,6 +420,9 @@ with tab3:
     
     [5] Niedermeyer, E., & da Silva, F. L. (Eds.). (2005). Electroencephalography: Basic Principles, Clinical Applications, and Related Fields. Lippincott Williams & Wilkins.
     
-    ## 
+                
+    st.markdown("𓆝 𓆟 𓆞 𓆝 𓆟")
+    st.markdown("EEG Sonification Explorer | Created by Claire Alverson ")
+    #### See Application Source Code at: https://github.com/clairea03/eeg-sonify
                 
     """)
