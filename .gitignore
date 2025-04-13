@@ -1,3 +1,15 @@
+# Project Specific:
+
+# Generated audio files
+*.wav
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS specific
+.DS_Store
+
+# -----
 __pycache__
 *.py[cod]
 *$py.class
