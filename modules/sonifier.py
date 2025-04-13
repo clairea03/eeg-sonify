@@ -1,5 +1,4 @@
 import numpy as np
-import sounddevice as sd
 from scipy import signal
 
 class EEGSonifier:
