@@ -419,10 +419,8 @@ with tab3:
     [4] Hermann, T., Hunt, A., & Neuhoff, J. G. (Eds.). (2011). The Sonification Handbook. Logos Verlag Berlin.
     
     [5] Niedermeyer, E., & da Silva, F. L. (Eds.). (2005). Electroencephalography: Basic Principles, Clinical Applications, and Related Fields. Lippincott Williams & Wilkins.
-    
-                
-    st.markdown("𓆝 𓆟 𓆞 𓆝 𓆟")
-    st.markdown("EEG Sonification Explorer | Created by Claire Alverson ")
-    #### See Application Source Code at: https://github.com/clairea03/eeg-sonify
-                
     """)
+                
+    st.markdown("𓆝 𓆟 𓆞 𓆝 𓆟 𓆝 𓆟")
+    st.markdown("EEG Sonification Explorer | Created by Claire Alverson ")
+    st.markdown("See Application Source Code at: https://github.com/clairea03/eeg-sonify")
