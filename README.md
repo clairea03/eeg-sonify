@@ -2,6 +2,8 @@
 
 A Streamlit application for exploring the sonification of EEG (electroencephalogram) signals. This application allows users to generate simulated EEG patterns for different brain states, visualize them in various ways, and listen to their sonified representations.
 
+View this project at: https://eeg-sonification.streamlit.app
+
 ## Features
 
 - **EEG Simulation**: Generate realistic EEG data for different brain states:
@@ -56,8 +58,7 @@ A Streamlit application for exploring the sonification of EEG (electroencephalog
 - Matplotlib
 - Streamlit
 - Pandas
-- SoundDevice
-- MNE (optional, for advanced EEG processing)
+- MNE 
 
 ## Technical Details
 
