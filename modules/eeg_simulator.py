@@ -89,7 +89,7 @@ class EEGSimulator:
             wave = np.zeros(len(self.time))
             # Width of 50 samples and sigma of 10 creates a brief (~200ms) sharp wave
             # similar to clinical observations of vertex waves
-            wave[t:t+50] = signal.gaussian(50, 10) * 2
+            wave[t:t+50] = signal.windows.gaussian(50, 10) * 2
             eeg_signal += wave
             
         return eeg_signal
@@ -200,7 +200,7 @@ class EEGSimulator:
             # The "* 2 - 1" creates the negative wave following the positive spike
             # which is characteristic of spike-wave complexes
             if width > 0:
-                spike = signal.gaussian(2*width, width/5) * 2 - 1
+                spike = signal.windows.gaussian(2*width, width/5) * 2 - 1
                 # Ensure spike length matches expected window
                 if len(spike) == 2*width:
                     seizure_component[center-width:center+width] += spike
