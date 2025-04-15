@@ -59,9 +59,9 @@ class EEGVisualizer:
         ]
         
         for name, fmin, fmax, color in bands:
-            # Span visualization helps clinicians quickly identify 
+            # Span visualization helps users quickly identify 
             # which frequency bands show abnormal activity
-            ax.axvspan(fmin, fmax, color=color, alpha=0.3, label=name)
+            ax.axvspan(fmin, fmax, color=color, alpha=0.45, label=name)
             
         ax.legend()
         ax.grid(True)
